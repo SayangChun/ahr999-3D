@@ -1,11 +1,9 @@
 import type { NextConfig } from "next";
 
-const repositoryName =
-  process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "Indicator";
+// GitHub Pages deployment for ahr999-3D.github.io (custom domain / root site).
+// Build with empty basePath so assets load at /_next/* when served at the domain root.
 const isGithubPages = process.env.GITHUB_ACTIONS === "true";
-const isUserSite = repositoryName.endsWith(".github.io");
-const basePath =
-  isGithubPages && repositoryName && !isUserSite ? `/${repositoryName}` : "";
+const basePath = isGithubPages ? "" : "";
 
 const nextConfig: NextConfig = {
   output: "export",
