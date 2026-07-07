@@ -1,41 +1,50 @@
-﻿# ahr999-3D
+# ahr999-3D
 
-ahr999-3D 鍥ゅ竵鎸囨爣锛屽叕寮忎负 `(Price / 200DCA) 脳 (Price / 鎷熷悎浠锋牸)`銆?
-**鎷熷悎浠锋牸鍙傛暟**
+ahr999-3D 囤币指标，公式为 `(Price / 200DCA) × (Price / 拟合价格)`。
+
+**拟合价格参数**
 - a: 5.5189
 - b: -15.8993
-- 璧峰鏃ユ湡: 2009-01-03
+- 起始日期: 2009-01-03
 
-**鐗圭偣**
-- 100% 瀹㈡埛绔紝鏃犻渶鍚庣鏈嶅姟鍣?- 瀹炴椂 BTC/USDT 浠锋牸锛圔inance WebSocket + REST 鍥為€€锛?- 鍘嗗彶鏁版嵁鑷姩缂撳瓨锛坙ocalStorage锛?2h 鏈夋晥锛?- 闈欐€佸鍑猴紝鍙儴缃茶嚦 GitHub Pages / Vercel 绛?
-## 蹇€熷紑濮?
+**特点**
+- 100% 客户端，无需后端服务器
+- 实时 BTC/USDT 价格（Binance WebSocket + REST 回退）
+- 历史数据自动缓存（localStorage，12h 有效）
+- 静态导出，可部署至 GitHub Pages / Vercel 等
+
+## 快速开始
+
 ```bash
 npm install
 npm run dev
 ```
 
-鎵撳紑 http://localhost:3000
+打开 http://localhost:3000
 
-## 鏋勫缓
+## 构建
 
 ```bash
-npm run build     # 杈撳嚭鍒?out/
-npm run start     # 鏈湴棰勮鏋勫缓浜х墿
+npm run build     # 输出到 out/
+npm run start     # 本地预览构建产物
 npm run lint
 ```
 
-## 鎶€鏈爤
+## 技术栈
 
 - Next.js 16 (App Router) + React 19 + TypeScript
-- Tailwind CSS v4 (CSS 閰嶇疆)
-- Recharts 鍥捐〃搴?- Binance 鍏紑 API锛堝鎴风鐩磋繛锛?
-## 閮ㄧ讲
+- Tailwind CSS v4 (CSS 配置)
+- Recharts 图表库
+- Binance 公开 API（客户端直连）
 
-闈欐€佸鍑?`out/` 鐩綍鍙洿鎺ユ墭绠¤嚦浠讳綍闈欐€佹枃浠舵湇鍔″櫒銆?
-GitHub Pages 閰嶇疆宸插湪 `next.config.ts` 涓鐣欙細
-- 璁剧疆 `GITHUB_REPOSITORY` 鐜鍙橀噺鏃惰嚜鍔ㄦ坊鍔?`basePath`
+## 部署
 
-## 鏁版嵁鏉ユ簮
+静态导出 `out/` 目录可直接托管至任何静态文件服务器。
 
-- 褰撳墠浠锋牸锛欱inance WebSocket (`wss://stream.binance.com:9443/ws/btcusdt@trade`) + REST 鍥為€€
-- 鍘嗗彶浠锋牸锛欱inance REST (`GET /api/v3/klines`)锛屾棩绾挎暟鎹?
+GitHub Pages 配置已在 `next.config.ts` 中预留：
+- 设置 `GITHUB_REPOSITORY` 环境变量时自动添加 `basePath`
+
+## 数据来源
+
+- 当前价格：Binance WebSocket (`wss://stream.binance.com:9443/ws/btcusdt@trade`) + REST 回退
+- 历史价格：Binance REST (`GET /api/v3/klines`)，日线数据
