@@ -1,2 +1,1 @@
-# SayangChun Indicator
-自研囤币指标
+# ahr999-3D
