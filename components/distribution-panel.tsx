@@ -8,7 +8,7 @@ import { formatIndicator, formatPercent } from "@/lib/calculations";
 type Props = {
   series: IndicatorPoint[];
   stats: IndicatorStats | null;
-  currentIndicator: number;
+  currentIndicator: number | null;
 };
 
 const ZONES = [
@@ -43,6 +43,7 @@ export function DistributionPanel({
   }, [series]);
 
   const currentZone = useMemo(() => {
+    if (currentIndicator == null) return null;
     if (currentIndicator < 0.45) return "bottom";
     if (currentIndicator <= 1.2) return "normal";
     return "danger";
@@ -104,14 +105,14 @@ export function DistributionPanel({
             {formatIndicator(currentIndicator)}
           </span>
         </span>
-        <span>→</span>
+        <span>&rarr;</span>
         <span
           className="font-semibold"
           style={{
-            color: ZONES.find((z) => z.key === currentZone)?.color,
+            color: currentZone ? ZONES.find((z) => z.key === currentZone)?.color : "#606060",
           }}
         >
-          {ZONES.find((z) => z.key === currentZone)?.label}
+          {currentZone ? ZONES.find((z) => z.key === currentZone)?.label : "--"}
         </span>
         {stats && (
           <>

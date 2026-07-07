@@ -13,6 +13,7 @@ export type PriceState = {
   price: number;
   status: PriceStatus;
   lastUpdated: Date | null;
+  ready: boolean;
 };
 
 export function useBtcPrice(): PriceState {
@@ -20,6 +21,7 @@ export function useBtcPrice(): PriceState {
     price: FALLBACK_PRICE,
     status: "connecting",
     lastUpdated: null,
+    ready: false,
   });
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const attemptRef = useRef(0);
@@ -38,7 +40,12 @@ export function useBtcPrice(): PriceState {
         const data = (await res.json()) as { price?: string };
         const p = Number(data.price);
         if (mounted && Number.isFinite(p) && p > 0) {
-          setState({ price: p, status: "polling", lastUpdated: new Date() });
+          setState({
+            price: p,
+            status: "polling",
+            lastUpdated: new Date(),
+            ready: true,
+          });
         }
       } catch {
         if (mounted) setState((s) => ({ ...s, status: "offline" }));
@@ -55,7 +62,12 @@ export function useBtcPrice(): PriceState {
           const d = JSON.parse(ev.data as string) as { p?: string };
           const p = Number(d.p);
           if (Number.isFinite(p) && p > 0) {
-            setState({ price: p, status: "live", lastUpdated: new Date() });
+            setState({
+              price: p,
+              status: "live",
+              lastUpdated: new Date(),
+              ready: true,
+            });
           }
         } catch { /* ignore */ }
       };

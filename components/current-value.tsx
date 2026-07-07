@@ -4,9 +4,9 @@ import { Card } from "@/components/ui/card";
 import { formatCurrency, formatIndicator } from "@/lib/calculations";
 
 type Props = {
-  currentPrice: number;
-  currentIndicator: number;
-  currentDca200: number;
+  currentPrice: number | null;
+  currentIndicator: number | null;
+  currentDca200: number | null;
   currentModelPrice: number;
   status: string;
 };
@@ -29,7 +29,7 @@ export function CurrentValue({ currentPrice, currentIndicator, currentDca200, cu
                   : "离线"}
           </span>
         </div>
-        <div className="text-4xl font-semibold tracking-tight text-[#f0f0f0]">
+        <div className="text-4xl font-semibold tracking-tight text-[#f0f0f0] tabular-nums">
           {formatIndicator(currentIndicator)}
         </div>
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#a0a0a0]">

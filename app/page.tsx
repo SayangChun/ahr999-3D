@@ -9,7 +9,7 @@ import { Methodology } from "@/components/methodology";
 import { formatIndicator, formatPercent } from "@/lib/calculations";
 
 export default function Home() {
-  const { price, status, lastUpdated } = useBtcPrice();
+  const { price, status, lastUpdated, ready: priceReady } = useBtcPrice();
   const {
     series,
     loading,
@@ -17,7 +17,7 @@ export default function Home() {
     currentIndicator,
     currentDca200,
     currentModelPrice,
-  } = useIndicatorHistory(price);
+  } = useIndicatorHistory(price, priceReady);
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-4 bg-[#0b0b0b] px-4 py-6 text-[#f0f0f0]">
@@ -37,7 +37,7 @@ export default function Home() {
       </header>
 
       <CurrentValue
-        currentPrice={price}
+        currentPrice={priceReady ? price : null}
         currentIndicator={currentIndicator}
         currentDca200={currentDca200}
         currentModelPrice={currentModelPrice}

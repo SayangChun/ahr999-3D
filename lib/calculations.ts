@@ -39,7 +39,8 @@ export function computeStats(
   };
 }
 
-export function formatCurrency(value: number): string {
+export function formatCurrency(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return "--";
   return new Intl.NumberFormat("zh-CN", {
     style: "currency",
     currency: "USD",
@@ -48,7 +49,8 @@ export function formatCurrency(value: number): string {
   }).format(value);
 }
 
-export function formatIndicator(value: number): string {
+export function formatIndicator(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return "--";
   return value.toFixed(4);
 }
 

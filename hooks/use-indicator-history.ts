@@ -84,9 +84,12 @@ type HistoryState = {
   error: boolean;
 };
 
-export function useIndicatorHistory(currentPrice: number): HistoryState & {
+export function useIndicatorHistory(
+  currentPrice: number,
+  priceReady: boolean,
+): HistoryState & {
   stats: IndicatorStats | null;
-  currentIndicator: number;
+  currentIndicator: number | null;
   currentDca200: number;
   currentModelPrice: number;
 } {
@@ -108,9 +111,11 @@ export function useIndicatorHistory(currentPrice: number): HistoryState & {
   }, []);
 
   const currentIndicator = useMemo(() => {
-    if (currentPrice <= 0 || currentDca200 <= 0) return 0;
+    if (!priceReady || currentPrice <= 0 || currentDca200 <= 0) return 0;
     return calculateAhr999(currentPrice, currentDca200, currentModelPrice);
-  }, [currentPrice, currentDca200, currentModelPrice]);
+  }, [currentPrice, currentDca200, currentModelPrice, priceReady]);
+
+  const currentIndicatorReady = priceReady && currentPrice > 0 && currentDca200 > 0;
 
   useEffect(() => {
     let cancelled = false;
@@ -172,16 +177,16 @@ export function useIndicatorHistory(currentPrice: number): HistoryState & {
   }, []);
 
   const stats = useMemo(() => {
-    if (series.length === 0) return null;
+    if (series.length === 0 || !currentIndicatorReady) return null;
     return computeStats(series, currentIndicator);
-  }, [series, currentIndicator]);
+  }, [series, currentIndicator, currentIndicatorReady]);
 
   return {
     series,
     loading: state.loading,
     error: state.error,
     stats,
-    currentIndicator,
+    currentIndicator: currentIndicatorReady ? currentIndicator : null,
     currentDca200,
     currentModelPrice,
   };
