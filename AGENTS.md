@@ -6,16 +6,16 @@
 |------------------|---------|
 | `start-website.bat` (double-click) | Dev server at `http://localhost:3000` |
 | `npm run dev` | Dev server |
-| `npm run build` | Static export to `out/` |
+| `npm run build` | Next.js production build |
 | `npm run lint` | ESLint |
-| `npm run start` | Serve built `out/` via `serve` |
+| `npm run start` | Serve the Next.js production build |
 
 No test runner or formatter exists. Do not add any.
 
 ## Architecture
 
 - **SPA only** — `app/page.tsx` is `"use client"`. All hooks are client-only.
-- **Static export** — `next.config.ts`: `output: "export"`, `trailingSlash: true`. `basePath`/`assetPrefix` set only in GitHub Actions.
+- **Vercel-friendly build** — `next.config.ts` uses the default Next.js production build.
 - **Path alias** — `@/*` → repo root.
 - **State** — No persistence for user state. History cache in localStorage key `ahr999:history:v1`.
 - **Dark only** — `<html className="dark">` in layout.tsx.
