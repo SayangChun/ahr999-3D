@@ -22,7 +22,7 @@ type Props = {
 };
 
 export function IndicatorChart({ series, loading }: Props) {
-  const { chartData, yDomain } = useMemo(() => {
+  const { chartData, yDomain, yTicks } = useMemo(() => {
     const data = series.map((p) => {
       const val = Math.round(p.indicator * 10000) / 10000;
       return {
@@ -31,10 +31,23 @@ export function IndicatorChart({ series, loading }: Props) {
         logValue: Math.log10(Math.max(val, 1e-10)),
       };
     });
-    const logs = data.map((d) => d.logValue);
-    const yMin = Math.floor(Math.min(...logs)) - 0.5;
-    const yMax = Math.ceil(Math.max(...logs)) + 0.5;
-    return { chartData: data, yDomain: [yMin, yMax] };
+    const logs = data.map((d) => d.logValue).filter(Number.isFinite);
+    if (logs.length === 0) {
+      return { chartData: data, yDomain: [-1, 1] as [number, number], yTicks: [-1, 0, 1] };
+    }
+    const minLog = Math.min(...logs);
+    const maxLog = Math.max(...logs);
+    // 当所有值相同时 range 为 0，给一个最小边距避免 NaN
+    const range = maxLog - minLog || 1;
+    const padding = range * 0.05;
+    const yMin = minLog - padding;
+    const yMax = maxLog + padding;
+    // 只生成落在 [yMin, yMax] 范围内的整数对数刻度
+    const firstTick = Math.ceil(yMin);
+    const lastTick = Math.floor(yMax);
+    const yTicks: number[] = [];
+    for (let t = firstTick; t <= lastTick; t++) yTicks.push(t);
+    return { chartData: data, yDomain: [yMin, yMax] as [number, number], yTicks };
   }, [series]);
 
   if (loading && chartData.length === 0) {
@@ -83,7 +96,7 @@ export function IndicatorChart({ series, loading }: Props) {
             stroke="#2a2a2a"
             width={55}
             domain={yDomain}
-            ticks={[-2, -1, 0, 1, 2]}
+            ticks={yTicks}
             tickFormatter={(v: number) => String(Math.pow(10, v))}
           />
           <Tooltip
