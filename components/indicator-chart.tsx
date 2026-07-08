@@ -21,6 +21,46 @@ type Props = {
   loading: boolean;
 };
 
+// log10 值对应的参考线定义
+const REF_DOTE   = 0.079;   // log10(1.2)  定投线
+const REF_CHAODI = -0.347;  // log10(0.45) 抄底线
+
+interface TickProps {
+  x?: number;
+  y?: number;
+  payload?: { value: number };
+}
+
+function CustomYTick({ x = 0, y = 0, payload }: TickProps) {
+  const v = payload?.value ?? 0;
+
+  if (Math.abs(v - REF_DOTE) < 0.0001) {
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dy={4} textAnchor="end" fill="#eab308" fontSize={10}>
+          定投 1.2
+        </text>
+      </g>
+    );
+  }
+  if (Math.abs(v - REF_CHAODI) < 0.0001) {
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text x={0} y={0} dy={4} textAnchor="end" fill="#22c55e" fontSize={10}>
+          抄底 0.45
+        </text>
+      </g>
+    );
+  }
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={4} textAnchor="end" fill="#a0a0a0" fontSize={10}>
+        {String(Math.pow(10, v))}
+      </text>
+    </g>
+  );
+}
+
 export function IndicatorChart({ series, loading }: Props) {
   const { chartData, yDomain, yTicks } = useMemo(() => {
     const data = series.map((p) => {
@@ -45,9 +85,12 @@ export function IndicatorChart({ series, loading }: Props) {
     // 只生成落在 [yMin, yMax] 范围内的整数对数刻度
     const firstTick = Math.ceil(yMin);
     const lastTick = Math.floor(yMax);
-    const yTicks: number[] = [];
-    for (let t = firstTick; t <= lastTick; t++) yTicks.push(t);
-    return { chartData: data, yDomain: [yMin, yMax] as [number, number], yTicks };
+    const intTicks: number[] = [];
+    for (let t = firstTick; t <= lastTick; t++) intTicks.push(t);
+    // 将参考线刻度插入（仅限在可见范围内）
+    const refTicks = [REF_DOTE, REF_CHAODI].filter((r) => r > yMin && r < yMax);
+    const allTicks = [...intTicks, ...refTicks].sort((a, b) => a - b);
+    return { chartData: data, yDomain: [yMin, yMax] as [number, number], yTicks: allTicks };
   }, [series]);
 
   if (loading && chartData.length === 0) {
@@ -92,12 +135,11 @@ export function IndicatorChart({ series, loading }: Props) {
             minTickGap={60}
           />
           <YAxis
-            tick={{ fontSize: 10, fill: "#a0a0a0" }}
             stroke="#2a2a2a"
-            width={55}
+            width={68}
             domain={yDomain}
             ticks={yTicks}
-            tickFormatter={(v: number) => String(Math.pow(10, v))}
+            tick={(props: TickProps) => <CustomYTick {...props} />}
           />
           <Tooltip
             contentStyle={{
@@ -110,8 +152,8 @@ export function IndicatorChart({ series, loading }: Props) {
             formatter={(value) => [formatIndicator(Math.pow(10, Number(value ?? 0))), "指标值"]}
           />
           <ReferenceLine y={0} stroke="#3b82f6" strokeOpacity={0.3} strokeDasharray="4 4" />
-          <ReferenceLine y={0.079} stroke="#eab308" strokeOpacity={0.5} strokeDasharray="6 3" label={{ value: "定投线 1.2", position: "insideTopRight", fontSize: 10, fill: "#eab308" }} />
-          <ReferenceLine y={-0.347} stroke="#22c55e" strokeOpacity={0.5} strokeDasharray="6 3" label={{ value: "抄底线 0.45", position: "insideTopRight", fontSize: 10, fill: "#22c55e" }} />
+          <ReferenceLine y={REF_DOTE}   stroke="#eab308" strokeOpacity={0.5} strokeDasharray="6 3" />
+          <ReferenceLine y={REF_CHAODI} stroke="#22c55e" strokeOpacity={0.5} strokeDasharray="6 3" />
           <Area
             type="monotone"
             dataKey="logValue"
