@@ -26,17 +26,19 @@ const REF_DOTE   = 0.079;   // log10(1.2)  定投线
 const REF_CHAODI = -0.347;  // log10(0.45) 抄底线
 
 interface TickProps {
-  x?: number;
-  y?: number;
+  x?: string | number;
+  y?: string | number;
   payload?: { value: number };
 }
 
 function CustomYTick({ x = 0, y = 0, payload }: TickProps) {
+  const nx = Number(x);
+  const ny = Number(y);
   const v = payload?.value ?? 0;
 
   if (Math.abs(v - REF_DOTE) < 0.0001) {
     return (
-      <g transform={`translate(${x},${y})`}>
+      <g transform={`translate(${nx},${ny})`}>
         <text x={0} y={0} dy={4} textAnchor="end" fill="#eab308" fontSize={10}>
           定投 1.2
         </text>
@@ -45,7 +47,7 @@ function CustomYTick({ x = 0, y = 0, payload }: TickProps) {
   }
   if (Math.abs(v - REF_CHAODI) < 0.0001) {
     return (
-      <g transform={`translate(${x},${y})`}>
+      <g transform={`translate(${nx},${ny})`}>
         <text x={0} y={0} dy={4} textAnchor="end" fill="#22c55e" fontSize={10}>
           抄底 0.45
         </text>
@@ -53,7 +55,7 @@ function CustomYTick({ x = 0, y = 0, payload }: TickProps) {
     );
   }
   return (
-    <g transform={`translate(${x},${y})`}>
+      <g transform={`translate(${nx},${ny})`}>
       <text x={0} y={0} dy={4} textAnchor="end" fill="#a0a0a0" fontSize={10}>
         {String(Math.pow(10, v))}
       </text>
@@ -139,7 +141,7 @@ export function IndicatorChart({ series, loading }: Props) {
             width={68}
             domain={yDomain}
             ticks={yTicks}
-            tick={(props: TickProps) => <CustomYTick {...props} />}
+            tick={(props) => <CustomYTick {...(props as TickProps)} />}
           />
           <Tooltip
             contentStyle={{
